@@ -8,24 +8,25 @@ export const register = async (req, res) => {
     const {email, password, username} = req.body;
 
     try {
-
         const userFound = await User.findOne({email})
         if(userFound) return res.status(400).json(["The email is already in use"]);
 
         const passwordHash = await bcrypt.hash(password, 10);
 
         const newUser = new User({
-        username,
-        email,
-        password: passwordHash,
-         })
+            username,
+            email,
+            password: passwordHash,
+        })
 
         const userSaved = await newUser.save();
         const token = await createAccessToken({id: userSaved._id}); 
+        
         res.cookie('token', token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none"
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 24 * 60 * 60 * 1000  // ✅ 24 horas de expiración
         });
 
         res.json({
@@ -33,31 +34,30 @@ export const register = async (req, res) => {
             username: userSaved.username,
             email: userSaved.email,
             createdAt: userSaved.createdAt,
-            updateAt: userSaved.updatedAt,
+            updatedAt: userSaved.updatedAt,  // ✅ Corregido typo
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-
 };
 
 export const login = async (req, res) => {
     const {email, password} = req.body;
 
     try {
-
         const userFound = await User.findOne({email});
-        if(!userFound)return res.status(400).json({ message: "User not found"});
+        if(!userFound) return res.status(400).json({ message: "User not found"});
 
-        const isMacth = await bcrypt.compare(password, userFound.password);
-        if(!isMacth) return res.status(400).json({ message: "Incorret password"})
+        const isMatch = await bcrypt.compare(password, userFound.password);  // ✅ Corregido typo
+        if(!isMatch) return res.status(400).json({ message: "Incorrect password"})  // ✅ Corregido typo
 
         const token = await createAccessToken({id: userFound._id}); 
 
         res.cookie('token', token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none"
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 24 * 60 * 60 * 1000  // ✅ Agregado maxAge
         });
 
         res.json({
@@ -65,20 +65,19 @@ export const login = async (req, res) => {
             username: userFound.username,
             email: userFound.email,
             createdAt: userFound.createdAt,
-            updateAt: userFound.updatedAt,
+            updatedAt: userFound.updatedAt,  // ✅ Corregido typo
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-
 };
 
 export const logout = (req, res) => {
     res.cookie('token', "", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    expires: new Date(0),
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        expires: new Date(0),
     });
 
     return res.sendStatus(200);
@@ -94,9 +93,8 @@ export const profile = async (req, res) => {
         username: userFound.username,
         email: userFound.email,
         createdAt: userFound.createdAt,
-        updateAt: userFound.updatedAt,
+        updatedAt: userFound.updatedAt,  // ✅ Corregido typo
     })
-
 }
 
 export const verifyToken = async (req, res) => {
@@ -115,7 +113,7 @@ export const verifyToken = async (req, res) => {
             username: userFound.username,
             email: userFound.email,
             createdAt: userFound.createdAt,
-            updateAt: userFound.updatedAt,
+            updatedAt: userFound.updatedAt,  // ✅ Corregido typo
         });
     });
 };

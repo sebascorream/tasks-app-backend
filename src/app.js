@@ -7,15 +7,13 @@ import taskRoutes from './routes/tasks.routes.js';
 
 const app = express();
 
-  app.use(cors({
-    origin: [
-      "http://localhost:5173",
-      "https://tasksapp-mmwpetbss-sebascorreams-projects.vercel.app"
-    ],
-    credentials: true
-  }));
-
-
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    process.env.FRONTEND_URL
+  ],
+  credentials: true
+}));
 
 app.use(morgan('dev'));
 app.use(express.json());

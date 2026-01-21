@@ -1,14 +1,26 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import app from "./app.js";
+import { connectDB } from "./db.js";
 
-import app from './app.js';
-import { connectDB } from './db.js';
+const PORT = process.env.PORT || 3000;
 
-console.log('MONGO URI =>', process.env.MONGO_URI);
+const startServer = async () => {
+  try {
+    // Conectar a la base de datos
+    await connectDB();
+    console.log("MongoDB conectado correctamente");
 
-connectDB();
+    // Levantar servidor
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log('Server running on port', process.env.PORT || 3000);
-});
+  } catch (error) {
+    console.error("Error al iniciar el servidor:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
